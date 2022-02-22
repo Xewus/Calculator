@@ -1,5 +1,5 @@
 # Calculator
-Test task for creating a queue and a calculator.
+Test task for creating a dequeue and a calculator.
 
 ## Calculator usind postfix notation.
 
