@@ -1,5 +1,7 @@
 # Calculator
-Calculator usind postfix notation.
+Test task for creating a queue and calculator.
+
+## Calculator usind postfix notation.
 
 Accepts a string with data and performs calculations according to the rules of Reverse Polish notation.
 ### Example:
@@ -8,3 +10,6 @@ Accepts a string with data and performs calculations according to the rules of R
 - `output >>> 6`
 
 What is Reverse Polish notation: https://en.wikipedia.org/wiki/Reverse_Polish_notation
+
+## Deck
+Bidirectional queue, with the ability to add and remove items at the beginning and end of the queue.
