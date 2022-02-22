@@ -4,11 +4,11 @@ class Stack:
     def __init__(self):
         self.__array = []
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.__array) 
     
     def add(self, value):
-        """Добавляет переданный объект в конец стека.
+        """Добавляет переданный объект в стек.
         
         Args:
             value (obj): Объект, который необходимо добавить.
@@ -19,22 +19,22 @@ class Stack:
         """Возвращает последний элемент стека.
 
         Returns:
-            str: Если в стеке нет элементов.
+            None: Если в стеке нет элементов.
             obj: Запрошенный из стека элемент.
         """
         if not self.__array:
-            return "Стек пуст"
+            return None
         return self.__array[-1]
     
     def pop(self):
         """Удаляет и возвращает последний элемент стека.
 
         Returns:
-            str: Если в стеке нет элементов.
+            None: Если в стеке нет элементов.
             obj: Удалённый из стека элемент.
         """
         if not self.__array:
-            return "Стек пуст"
+            return None
         return self.__array.pop()
 
     def get_operands(self, amount=2):
@@ -71,11 +71,8 @@ class Stack:
 class Calculator:
     """Класс с арифметическими методами.
     """
-    def __init__(self):
-        self._numbers = Stack()
-
     @staticmethod
-    def action(symbol, operands):
+    def action(symbol, operands) -> int:
         """Вызывает необходимые вычислительные методы.
 
         Args:
@@ -106,25 +103,25 @@ class Calculator:
                 raise ValueError("Переданы не целочисленные значения")
 
         if symbol == '+':
-            return Calculator._addition(*operands)
+            return Calculator.__addition(*operands)
         if symbol == '-':
-            return Calculator._subtraction(*operands)
+            return Calculator.__subtraction(*operands)
         if symbol == '*':
-            return Calculator._multiplication(*operands)
+            return Calculator.__multiplication(*operands)
         if symbol == '/':
-            return Calculator._division(*operands)
+            return Calculator.__division(*operands)
         raise AttributeError(f"Не поддерживаемая операция: `{symbol}`")
 
-    def _addition(a, b):
+    def __addition(a, b) -> int:
         return a + b
 
-    def _subtraction(a, b):
+    def __subtraction(a, b) -> int:
         return a - b
 
-    def _multiplication(a, b):
+    def __multiplication(a, b) -> int:
         return a * b
 
-    def _division(a, b):
+    def __division(a, b) -> int:
         return a // b
 
 
@@ -135,6 +132,9 @@ class PolishCalculator(Calculator):
         >>> - * 5 8 3
         37
     """
+    def __init__(self) -> None:
+        self._numbers = Stack()
+
     def _get_operands(self, amount=2):
         return self._numbers.get_operands(amount)
 
@@ -158,7 +158,7 @@ class PolishCalculator(Calculator):
             return int(value)
         return False
 
-    def get_result(self, data):
+    def get_result(self, data) -> int:
         """Производит вычисления согласно введённой строки.
 
         Args:
@@ -176,11 +176,7 @@ class PolishCalculator(Calculator):
             operands = self._get_operands(2)
             result = self.action(value, operands)
             self._numbers.add(result)
-        if len(self._numbers) > 1:
-            return (
-                "Введённая строка содержит лишние числа."
-                f"Вычисленный результат: {self._numbers.last()}"
-            )
+
         return self._numbers.last()
 
 
