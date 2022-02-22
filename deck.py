@@ -191,9 +191,6 @@ class ReversePolishCalculator(PolishCalculator):
         >>> 7 2 + 4 * 2 +
         38
     """
-    def _get_operands(self, amount=2):
-        return list(reversed(self._numbers.get_operands(amount)))
-
     @staticmethod
     def _normal_string(string):
         return string
