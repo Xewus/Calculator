@@ -87,29 +87,6 @@ class Calculator:
     """Сборник арифметических методов.
     """
     @staticmethod
-    def string_to_number(value: str) -> Union[int, bool]:
-        """Переводит переданное значение в int.
-
-        Ожидает положительные или отрицательные целые числа.
-        Если строка не подходит для перевода в тип int,
-        возвращает False.
-
-        Args:
-            value (str):  Число в строковом формате.
-
-        Returns:
-            int: Если строка прошла проверку.
-            False: Если строка не прошла проверку.
-
-        Example:
-            >>> Calculator.string_to_number("-9")
-            -9
-        """
-        if value[-1].isdecimal():
-            return int(value)
-        return False
-
-    @staticmethod
     def action(symbol: str, operands: Sequence[int]) -> int:
         """Вызывает необходимые вычислительные методы.
 
@@ -217,9 +194,8 @@ class PolishCalculator(Calculator):
             int: Вычисленное значение.
         """
         for value in self._normal_string(data):
-            number = self.string_to_number(value)
-            if number:
-                self._numbers.add(number)
+            if value[-1].isdecimal():
+                self._numbers.add(int(value))
                 continue
             operands: list = self._get_operands(2)
             result: int = self.action(value, operands)
