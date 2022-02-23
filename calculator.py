@@ -1,4 +1,4 @@
-from typing import Any, Sequence, Union
+from typing import Any, Sequence
 
 
 class Stack:
@@ -84,8 +84,7 @@ class Stack:
 
 
 class Calculator:
-    """Сборник арифметических методов.
-    """
+    """Сборник арифметических методов."""
     @staticmethod
     def action(symbol: str, operands: Sequence[int]) -> int:
         """Вызывает необходимые вычислительные методы.
@@ -150,7 +149,6 @@ class PolishCalculator(Calculator):
 
     Attributes:
         _numbers: Стек, хранящий вводимые числа и результаты.
-        save_results: Указывает, сохранять ли в стеке итоговый результат.
 
     Examples:
         >>> - * 5 8 3
@@ -158,7 +156,6 @@ class PolishCalculator(Calculator):
     """
     def __init__(self) -> None:
         self._numbers: Stack = Stack()
-        self.save_results: bool = False
 
     def _get_operands(self, amount: int = 2) -> list:
         """Получает неообходимые значения для вычислений.
@@ -201,8 +198,6 @@ class PolishCalculator(Calculator):
             result: int = self.action(value, operands)
             self._numbers.add(result)
 
-        if not self.save_results:
-            return self._numbers.pop()
         return self._numbers.last()
 
 
