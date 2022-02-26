@@ -1,203 +1,183 @@
-class Stack:
-    """Реализация методов стека на основе списка.
-    """
-    def __init__(self):
-        self.__array = []
+from functools import total_ordering
 
-    def __len__(self) -> int:
-        return len(self.__array) 
-    
-    def add(self, value):
-        """Добавляет переданный объект в стек.
-        
+
+@total_ordering
+class Deck:
+    """Двунаправленная очередь.
+
+    Упорядоченная последовательность заданного размера с возможностью
+    добавления и удаления элементов в начале и в конце последовательности.
+
+    Attributes:
+        __array (list): Python-list заданного размера.
+        __head (int): Указатель на начало последовательности.
+        __tail (int): Указатель на первое пустое место в последовательности.
+        __size (int): Размер выделенного массива.
+        __empty (int): Количество пустых мест в последовательности.
+    """
+    def __init__(self, __size):
+        self.__array = [None] * __size
+        self.__empty = __size
+        self.__head = 0
+        self.__tail = 0
+        self.__size = __size
+        self.__empty = __size
+
+    def __str__(self):
+        return (
+            f"[{self.__array[self.__head]}, ..., "
+            f"{self.__array[self.__tail - 1]}]"
+        )
+
+    def __repr__(self):
+        return (
+            f"{self.__class__.__name__}: "
+            f"size={self.__size}, fullness={len(self)}"
+        )
+
+    def __len__(self):
+        """Показывает количество заполненных ячеек."""
+        return self.__size - self.__empty
+
+    def __eq__(self, __o):
+        if not isinstance(__o, Deck):
+            return False
+        if self.__size != __o.__size:
+            return False
+        return len(self) == len(__o)
+
+    def __lt__(self, __o):
+        if not isinstance(__o, Deck):
+            raise TypeError(
+                "Supports between instances of "
+                f"'{self.__class__.__name__}' only"
+            )
+        if self.__size < __o.__size:
+            return True
+        return len(self) < len(__o)
+
+    def size(self):
+        "Возвращает заданный размер очереди."
+        return self.__size
+
+    def clear(self):
+        """Очищает последовательность.
+        """
+        __size = len(self.__array)
+        self.__array = [None] * __size
+        self.__empty = __size
+        self.__head = 0
+        self.__tail = 0
+
+    def push_back(self, value):
+        """Добавляет элемент в конец последовательности.
+
         Args:
             value (obj): Объект, который необходимо добавить.
-        """
-        self.__array.append(value)
-
-    def last(self):
-        """Возвращает последний элемент стека.
 
         Returns:
-            None: Если в стеке нет элементов.
-            obj: Запрошенный из стека элемент.
+            str: `error`, если последовательность заполнена.
         """
-        if not self.__array:
-            return None
-        return self.__array[-1]
-    
-    def pop(self):
-        """Удаляет и возвращает последний элемент стека.
+        if not self.__empty:
+            return 'error'
+        self.__array[self.__tail] = value
+        self.__empty -= 1
+        self.__tail += 1
+        if self.__tail == len(self.__array):
+            self.__tail = 0
 
-        Returns:
-            None: Если в стеке нет элементов.
-            obj: Удалённый из стека элемент.
-        """
-        if not self.__array:
-            return None
-        return self.__array.pop()
-
-    def get_operands(self, amount=2):
-        """Возвращает требуемое количество элементов с конца списка.
-
-        По умолчанию возвращает два значения использующихся
-        в большинстве простых арифметических операций.
+    def push_front(self, value):
+        """Добавляет элемент в начало последовательности.
 
         Args:
-            amount (int): Количество требуемых значений.
+            value (obj): Объект, который необходимо добавить.
 
         Returns:
-            operands (list): Список из требуемых значений.
-
-        Raises:
-            ValueError:
-                Запрошено не натуральное число.
-            IndexError:
-                Запрошено количество больше, чем имеется элементов в списке.
+            str: `error`, если последовательность заполнена.
         """
-        if amount < 1:
-            raise ValueError(
-                "Значение `amount` должно быть натуральным числом."
-            )
-        if amount > len(self.__array):
-            raise IndexError(
-                "Значение `amount` больше, чем элементов в стеке."
-            )
-        operands = self.__array[-amount:]
-        del self.__array[-amount:]
-        return operands
+        if not self.__empty:
+            return 'error'
+        self.__head -= 1
+        if self.__head < 0:
+            self.__head = len(self.__array) - 1
+        self.__array[self.__head] = value
+        self.__empty -= 1
 
-
-class Calculator:
-    """Класс с арифметическими методами.
-    """
-    @staticmethod
-    def action(symbol, operands) -> int:
-        """Вызывает необходимые вычислительные методы.
-
-        Args:
-            symbol (str): Символ математичнского действия.
-                operands (sequence): Числа, с которыми необходимо
-                произвести математическое действие.
+    def pop_back(self):
+        """Удаляет и возвращает элемент в конце последовательности.
 
         Returns:
-            int: Результат вычислений.
-        
-        Raises:
-            ValueError:
-                Передано неверное количество чисел.
-            AttributeError:
-                Неподдерживаемое математическое действие.
-        
-        Examples:
-            >>> Calculator.action("+", (13, 4))
-            17
+            str: `error`, если последовательность пустая.
+            value (obj): Удалённый из последовательности объект.
         """
-        if len(operands) != 2:
-            raise ValueError(
-                "`operands` должно быть последовательностью из двух элементов"
-            )
-        
-        for operand in operands:
-            if not isinstance(operand, int):
-                raise ValueError("Переданы не целочисленные значения")
+        if self.__empty == len(self.__array):
+            return 'error'
+        self.__tail -= 1
+        if self.__tail < 0:
+            self.__tail = len(self.__array) - 1
+        value = self.__array[self.__tail]
+        self.__array[self.__tail] = None
+        self.__empty += 1
+        return value
 
-        if symbol == '+':
-            return Calculator.__addition(*operands)
-        if symbol == '-':
-            return Calculator.__subtraction(*operands)
-        if symbol == '*':
-            return Calculator.__multiplication(*operands)
-        if symbol == '/':
-            return Calculator.__division(*operands)
-        raise AttributeError(f"Не поддерживаемая операция: `{symbol}`")
-
-    def __addition(a, b) -> int:
-        return a + b
-
-    def __subtraction(a, b) -> int:
-        return a - b
-
-    def __multiplication(a, b) -> int:
-        return a * b
-
-    def __division(a, b) -> int:
-        return a // b
-
-
-class PolishCalculator(Calculator):
-    """Калькулятор, считающий по правилам польской нотации.
-
-    Examples:
-        >>> - * 5 8 3
-        37
-    """
-    def __init__(self) -> None:
-        self._numbers = Stack()
-
-    def _get_operands(self, amount=2):
-        return self._numbers.get_operands(amount)
-
-    @staticmethod
-    def _normal_string(string):
-        """Нормализует введённую строку.
-        
-        Args:
-            string (str): Строка с входными данными.
-        
-        Returns:
-            str: Нормализованная строка.
-        """
-        return reversed(string)
-
-    @staticmethod
-    def string_to_digit(value):
-        """Переводит переданное значение в int.
-        """
-        if value[-1].isdecimal():
-            return int(value)
-        return False
-
-    def get_result(self, data) -> int:
-        """Производит вычисления согласно введённой строки.
-
-        Args:
-            data (str): Строка с числами и операторами.
+    def pop_front(self):
+        """Удаляет и возвращает элемент в начале последовательности.
 
         Returns:
-            int: Вычисленное значение.
+            str: `error`, если последовательность пустая.
+            value (obj): Удалённый из последовательности объект.
         """
-        data = self._normal_string(data)
-        for value in data:
-            number = self.string_to_digit(value)
-            if not number is False:
-                self._numbers.add(number)
-                continue
-            operands = self._get_operands(2)
-            result = self.action(value, operands)
-            self._numbers.add(result)
+        if self.__empty == len(self.__array):
+            return 'error'
+        value = self.__array[self.__head]
+        self.__array[self.__head] = None
+        self.__empty += 1
+        self.__head += 1
+        if self.__head == len(self.__array):
+            self.__head = 0
+        return value
 
-        return self._numbers.last()
+    def get_back(self):
+        """Возвращает последний элемет последовательности.
+
+        Returns:
+            str: `error`, если последовательность пустая.
+            value (obj): Запрошенный элемент.
+        """
+        if self.__empty == len(self.__array):
+            return 'error'
+        value = self.__array[self.__tail - 1]
+        return value
+
+    def get_front(self):
+        """Возвращает первый элемет последовательности.
+
+        Returns:
+            str: `error`, если последовательность пустая.
+            value (obj): Запрошенный элемент.
+        """
+        if self.__empty == len(self.__array):
+            return 'error'
+        value = self.__array[self.__head]
+        return value
 
 
-class ReversePolishCalculator(PolishCalculator):
-    """Калькулятор, считающий по правилам обратной польской нотации.
+def main():
+    results = []
+    commands = int(input())
+    deck_size = int(input())
+    deck = Deck(deck_size)
+    for _ in range(commands):
+        command, *args = input().split()
+        attr = getattr(deck, command)
+        if attr:
+            result = attr(*args)
+        if result is not None:
+            results.append(result)
 
-    Examples:
-        >>> 7 2 + 4 * 2 +
-        38
-    """
-    @staticmethod
-    def _normal_string(string):
-        return string
-
-
-def test():
-    calculator = ReversePolishCalculator()
-    data = input().split()
-    result = calculator.get_result(data)
-    print(result)
+    results = '\n'.join(results)
+    print(results)
 
 
 if __name__ == '__main__':
-    test()
+    main()
