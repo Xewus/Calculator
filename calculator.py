@@ -1,4 +1,5 @@
-from typing import Any, Sequence
+# id 65491208
+from typing import Any, Sequence, Union
 
 
 class Stack:
@@ -84,9 +85,22 @@ class Stack:
 
 
 class Calculator:
-    """Сборник арифметических методов."""
+    """Сборник арифметических методов.
+
+    Attributes:
+        ACTIONS: Словарь с доступными операциями.
+    """
+    ACTIONS = {
+        "+": lambda x, y: x + y,
+        "-": lambda x, y: x - y,
+        "*": lambda x, y: x * y,
+        "/": lambda x, y: x // y,
+    }
+
     @staticmethod
-    def action(symbol: str, operands: Sequence[int]) -> int:
+    def calculation(
+        symbol: str, operands: Sequence[Union[int, float]]
+    ) -> Union[int, float]:
         """Вызывает необходимые вычислительные методы.
 
         Args:
@@ -105,7 +119,7 @@ class Calculator:
             int: Результат вычислений.
 
         Example:
-            >>> Calculator.action("+", (13, 4))
+            >>> Calculator.calculation("+", (13, 4))
             17
         """
         if len(operands) != 2:
@@ -114,48 +128,29 @@ class Calculator:
             )
 
         for operand in operands:
-            if not isinstance(operand, int):
-                raise ValueError("Переданы не целочисленные значения")
+            if not isinstance(operand, (int, float)):
+                raise ValueError("Переданы не числовые значения")
 
-        if symbol == '+':
-            return Calculator.__addition(*operands)
-        if symbol == '-':
-            return Calculator.__subtraction(*operands)
-        if symbol == '*':
-            return Calculator.__multiplication(*operands)
-        if symbol == '/':
-            return Calculator.__division(*operands)
-        raise AttributeError(f"Не поддерживаемая операция: `{symbol}`")
+        action = Calculator.ACTIONS.get(symbol)
 
-    @staticmethod
-    def __addition(a: int, b: int) -> int:
-        return a + b
+        if action is None:
+            raise AttributeError(f"Не поддерживаемая операция: `{symbol}`")
 
-    @staticmethod
-    def __subtraction(a: int, b: int) -> int:
-        return a - b
-
-    @staticmethod
-    def __multiplication(a: int, b: int) -> int:
-        return a * b
-
-    @staticmethod
-    def __division(a: int, b: int) -> int:
-        return a // b
+        return action(*operands)
 
 
 class PolishCalculator(Calculator):
     """Калькулятор, считающий по правилам польской нотации.
 
     Attributes:
-        _numbers: Стек, хранящий вводимые числа и результаты.
+        __numbers: Стек, хранящий вводимые числа и результаты.
 
     Examples:
         >>> - * 5 8 3
         37
     """
     def __init__(self) -> None:
-        self._numbers: Stack = Stack()
+        self.__numbers: Stack = Stack()
 
     def _get_operands(self, amount: int = 2) -> list:
         """Получает неообходимые значения для вычислений.
@@ -167,7 +162,7 @@ class PolishCalculator(Calculator):
         Returns:
             list: Список с необходимыми значениями.
         """
-        return self._numbers.get_operands(amount)
+        return self.__numbers.get_operands(amount)
 
     @staticmethod
     def _normal_string(string: str) -> str:
@@ -181,7 +176,7 @@ class PolishCalculator(Calculator):
         """
         return str(reversed(string))
 
-    def get_result(self, data: str) -> int:
+    def get_result(self, data: str) -> Union[int, float]:
         """Производит вычисления согласно введённой строки.
 
         Args:
@@ -192,13 +187,13 @@ class PolishCalculator(Calculator):
         """
         for value in self._normal_string(data):
             if value[-1].isdecimal():
-                self._numbers.add(int(value))
+                self.__numbers.add(float(value))
                 continue
             operands: list = self._get_operands(2)
-            result: int = self.action(value, operands)
-            self._numbers.add(result)
+            result: int = self.calculation(value, operands)
+            self.__numbers.add(result)
 
-        return self._numbers.last()
+        return self.__numbers.last()
 
 
 class ReversePolishCalculator(PolishCalculator):
@@ -213,12 +208,12 @@ class ReversePolishCalculator(PolishCalculator):
         return string
 
 
-def test():
+def main():
     calculator = ReversePolishCalculator()
     data = input().split()
     result = calculator.get_result(data)
-    print(result)
+    print(int(result))
 
 
 if __name__ == '__main__':
-    test()
+    main()
