@@ -1,4 +1,3 @@
-# id 65491208
 from typing import Any, Sequence, Union
 
 
@@ -7,9 +6,19 @@ class Stack:
 
     Attributes:
         __array: Список, хранящий данные.
+
+    Examples:
+        >>> stack = Stack()
+        >>> stack
+        Stack: [...]
     """
     def __init__(self) -> None:
         self.__array: list = []
+
+    def __repr__(self) -> str:
+        if not self.__array:
+            return f"{self.__class__.__name__}: [...]"
+        return f"{self.__class__.__name__}: [..., {self.__array[-1]}]"
 
     def __len__(self) -> int:
         return len(self.__array)
@@ -19,8 +28,28 @@ class Stack:
 
         Args:
             value (obj): Объект, который необходимо добавить.
+
+        Examples:
+            >>> stack = Stack()
+            >>> stack.add(7)
+            >>> stack
+            Stack: [..., 7]
         """
         self.__array.append(value)
+
+    def extend(self, __iterable):
+        """Добавляет в стек элементы переданной последовательности.
+
+        Args:
+            __iterable (_type_): Передаваемая последовательность.
+
+        Examples:
+            >>> stack = Stack()
+            >>> stack.extend([1, 2, 3])
+            >>> stack
+            Stack: [..., 3]
+        """
+        self.__array.extend(__iterable)
 
     def last(self) -> Any:
         """Возвращает последний элемент в стеке.
@@ -30,6 +59,14 @@ class Stack:
 
         Returns:
             Any (obj): Последний элемент в стеке.
+
+        Examples:
+            >>> stack = Stack()
+            >>> stack.extend([3, 5, 7])
+            >>> stack.last()
+            7
+            >>> stack
+            Stack: [..., 7]
         """
         if not self.__array:
             raise IndexError("Stack is empty")
@@ -43,13 +80,29 @@ class Stack:
 
         Returns:
             Any (obj): Последний элемент в стеке.
+
+        Examples:
+            >>> stack = Stack()
+            >>> stack.extend([3, 5, 7])
+            >>> stack.pop()
+            7
+            >>> stack
+            Stack: [..., 5]
         """
         if not self.__array:
             raise IndexError("Stack is empty")
         return self.__array.pop()
 
     def clear(self) -> None:
-        """Очищает стек."""
+        """Очищает стек.
+
+        Examples:
+            >>> stack = Stack()
+            >>> stack.extend([3, 5, 7])
+            >>> stack.clear()
+            >>> stack
+            Stack: [...]
+        """
         del self.__array[:]
 
     def get_operands(self, amount: int = 2) -> list:
@@ -70,6 +123,14 @@ class Stack:
 
         Returns:
             operands (list): Список из требуемых значений.
+
+        Examples:
+            >>> stack = Stack()
+            >>> stack.extend([1, 3, 5, 7])
+            >>> stack.get_operands()
+            [5, 7]
+            >>> stack.get_operands(1)
+            [3]
         """
         if amount < 1:
             raise ValueError(
@@ -121,6 +182,8 @@ class Calculator:
         Example:
             >>> Calculator.calculation("+", (13, 4))
             17
+            >>> Calculator.calculation("-", (13, 4))
+            9
         """
         if len(operands) != 2:
             raise ValueError(
@@ -146,48 +209,59 @@ class PolishCalculator(Calculator):
         __numbers: Стек, хранящий вводимые числа и результаты.
 
     Examples:
-        >>> - * 5 8 3
+        >>> calculator = PolishCalculator()
+        >>> calculator.get_result("- * 5 8 3")
         37
     """
     def __init__(self) -> None:
         self.__numbers: Stack = Stack()
 
     def _get_operands(self, amount: int = 2) -> list:
-        """Получает неообходимые значения для вычислений.
+        """Получает неообходимые числа для вычислений.
 
         Args:
             amount (int, optional): Количество необходимых значений.
             Defaults to 2.
 
         Returns:
-            list: Список с необходимыми значениями.
+            list: Список с числами для вычислений.
         """
-        return self.__numbers.get_operands(amount)
+        return list(reversed(self.__numbers.get_operands(amount)))
 
     @staticmethod
-    def _normal_string(string: str) -> str:
-        """Нормализует введённую строку под правила калькулятора.
+    def _normal_input_data(data: Sequence) -> list:
+        """Нормализует введённую последовательность под правила калькулятора.
 
         Args:
-            string (str): Строка с входными данными.
+            data (Sequnce): Последовательность с входными данными.
 
         Returns:
-            str: Нормализованная строка.
+            list: Нормализованный список.
         """
-        return str(reversed(string))
+        if isinstance(data, (list, tuple)):
+            return list(reversed(data))
+        if isinstance(data, str):
+            return list(reversed(data.split()))
+        raise TypeError("На ввод ожидается str/list/tuple")
 
-    def get_result(self, data: str) -> Union[int, float]:
+    def get_result(self, data: str, typ=int) -> Union[int, float, complex]:
         """Производит вычисления согласно введённой строки.
+
+        Ожидает данные в форми строки/списка/кортежа, и проводит вычисления
+        согласно переданным данным с требуемым типом чисел.
+        По умолчанию использует тип `int`.
 
         Args:
             data (str): Строка с числами и операторами.
+            typ (_type_, optional): Тип чисел для вычислений.
+            Defaults to int.
 
         Returns:
-            int: Вычисленное значение.
+            Union[int, float, complex]: Вычисленное значение.
         """
-        for value in self._normal_string(data):
+        for value in self._normal_input_data(data):
             if value[-1].isdecimal():
-                self.__numbers.add(float(value))
+                self.__numbers.add(typ(value))
                 continue
             operands: list = self._get_operands(2)
             result: int = self.calculation(value, operands)
@@ -200,12 +274,21 @@ class ReversePolishCalculator(PolishCalculator):
     """Калькулятор, считающий по правилам обратной польской нотации.
 
     Example:
-        >>> 7 2 + 4 * 2 +
+        >>> calculator = ReversePolishCalculator()
+        >>> calculator.get_result("7 2 + 4 * 2 +")
         38
     """
+
     @staticmethod
-    def _normal_string(string: str) -> str:
-        return string
+    def _normal_input_data(data: Sequence) -> list:
+        if isinstance(data, (list, tuple)):
+            return list(data)
+        if isinstance(data, str):
+            return data.split()
+        raise TypeError("На ввод ожидается str/list/tuple")
+
+    def _get_operands(self, amount: int = 2) -> list:
+        return list(reversed(super()._get_operands(amount)))
 
 
 def main():
