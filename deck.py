@@ -14,6 +14,11 @@ class Deck:
         __tail (int): Указатель на первое пустое место в последовательности.
         __size (int): Размер выделенного массива.
         __empty (int): Количество пустых мест в последовательности.
+
+    Examples:
+        >>> deck = Deck(5)
+        >>> deck
+        Deck: size=5, fullness=0
     """
     def __init__(self, __size):
         self.__array = [None] * __size
@@ -24,6 +29,12 @@ class Deck:
         self.__empty = __size
 
     def __str__(self):
+        """
+        Examples:
+        >>> deck = Deck(5)
+        >>> str(deck)
+        '[None, ..., None]'
+        """
         return (
             f"[{self.__array[self.__head]}, ..., "
             f"{self.__array[self.__tail - 1]}]"
@@ -36,10 +47,31 @@ class Deck:
         )
 
     def __len__(self):
-        """Показывает количество заполненных ячеек."""
+        """Показывает количество заполненных ячеек.
+
+        Examples:
+        >>> deck = Deck(5)
+        >>> len(deck)
+        0
+        >>> deck.push_back(9)
+        >>> len(deck)
+        1
+        """
         return self.__size - self.__empty
 
     def __eq__(self, __o):
+        """
+        Examples:
+        >>> deck_1 = Deck(5)
+        >>> deck_1 == 5
+        False
+        >>> deck_2 = Deck(5)
+        >>> deck_1 == deck_2
+        True
+        >>> deck_1.push_back(9)
+        >>> deck_1 == deck_2
+        False
+        """
         if not isinstance(__o, Deck):
             return False
         if self.__size != __o.__size:
@@ -47,6 +79,19 @@ class Deck:
         return len(self) == len(__o)
 
     def __lt__(self, __o):
+        """
+        Examples:
+        >>> deck_1 = Deck(5)
+        >>> deck_2 = Deck(5)
+        >>> deck_1 < deck_2
+        False
+        >>> deck_1.push_back(9)
+        >>> deck_2 < deck_1
+        True
+        >>> deck_3 = Deck(6)
+        >>> deck_1 < deck_3
+        True
+        """
         if not isinstance(__o, Deck):
             raise TypeError(
                 "Supports between instances of "
@@ -57,11 +102,26 @@ class Deck:
         return len(self) < len(__o)
 
     def size(self):
-        "Возвращает заданный размер очереди."
+        """
+        Examples:
+        >>> deck = Deck(5)
+        >>> deck.size()
+        5
+        >>> deck.push_back(9)
+        >>> deck.size()
+        5
+        """
         return self.__size
 
     def clear(self):
         """Очищает последовательность.
+
+        Examples:
+        >>> deck = Deck(5)
+        >>> deck.push_back(9)
+        >>> deck.clear()
+        >>> deck
+        Deck: size=5, fullness=0
         """
         __size = len(self.__array)
         self.__array = [None] * __size
@@ -77,6 +137,16 @@ class Deck:
 
         Returns:
             str: `error`, если последовательность заполнена.
+
+        Examples:
+        >>> deck = Deck(5)
+        >>> deck.push_back(4)
+        >>> deck.push_back(9)
+        >>> deck
+        Deck: size=5, fullness=2
+        >>> str(deck)
+        '[4, ..., 9]'
+
         """
         if not self.__empty:
             return 'error'
@@ -94,6 +164,14 @@ class Deck:
 
         Returns:
             str: `error`, если последовательность заполнена.
+        Examples:
+        >>> deck = Deck(5)
+        >>> deck.push_front(4)
+        >>> deck.push_front(9)
+        >>> deck
+        Deck: size=5, fullness=2
+        >>> str(deck)
+        '[9, ..., 4]'
         """
         if not self.__empty:
             return 'error'
@@ -109,6 +187,15 @@ class Deck:
         Returns:
             str: `error`, если последовательность пустая.
             value (obj): Удалённый из последовательности объект.
+
+        Examples:
+        >>> deck = Deck(5)
+        >>> deck.push_back(4)
+        >>> deck.push_back(9)
+        >>> deck.pop_back()
+        9
+        >>> deck
+        Deck: size=5, fullness=1
         """
         if self.__empty == len(self.__array):
             return 'error'
@@ -126,6 +213,15 @@ class Deck:
         Returns:
             str: `error`, если последовательность пустая.
             value (obj): Удалённый из последовательности объект.
+
+        Examples:
+        >>> deck = Deck(5)
+        >>> deck.push_back(4)
+        >>> deck.push_back(9)
+        >>> deck.pop_front()
+        4
+        >>> deck
+        Deck: size=5, fullness=1
         """
         if self.__empty == len(self.__array):
             return 'error'
@@ -143,6 +239,15 @@ class Deck:
         Returns:
             str: `error`, если последовательность пустая.
             value (obj): Запрошенный элемент.
+
+        Examples:
+        >>> deck = Deck(5)
+        >>> deck.push_back(4)
+        >>> deck.push_back(9)
+        >>> deck.get_back()
+        9
+        >>> deck
+        Deck: size=5, fullness=2
         """
         if self.__empty == len(self.__array):
             return 'error'
@@ -155,6 +260,15 @@ class Deck:
         Returns:
             str: `error`, если последовательность пустая.
             value (obj): Запрошенный элемент.
+
+        Examples:
+        >>> deck = Deck(5)
+        >>> deck.push_back(4)
+        >>> deck.push_back(9)
+        >>> deck.get_front()
+        4
+        >>> deck
+        Deck: size=5, fullness=2
         """
         if self.__empty == len(self.__array):
             return 'error'
